@@ -12,7 +12,6 @@ import com.budiluhur.product_catalog.repository.ProductRepository;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    // constructor injection
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
@@ -22,21 +21,31 @@ public class ProductService {
     }
 
     public Product getProductById(String id) throws ProductNotFoundException {
-        return productRepository.findById(id);
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(
+                        "Produk dengan ID '" + id + "' tidak ditemukan!"));
     }
 
     public Product createProduct(Product product) {
-        productRepository.addProduct(product);
-        return product;
+        // Simpan ke database via JPA
+        return productRepository.save(product);
     }
 
-    public Product updateProduct(String id, Product product)
-            throws ProductNotFoundException {
-        return productRepository.updateProduct(id, product);
+    public Product updateProduct(String id, Product updatedProduct) throws ProductNotFoundException {
+        Product existingProduct = getProductById(id);
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        // Update ke database
+        return productRepository.save(existingProduct);
     }
 
-    public boolean deleteProduct(String id) throws ProductNotFoundException {
-        return productRepository.deleteById(id);
+    public void deleteProduct(String id) throws ProductNotFoundException {
+        Product existingProduct = getProductById(id);
+        productRepository.delete(existingProduct);
     }
 
+    // Mini Challenge:
+    public List<Product> searchProductsByName(String keyword) {
+        return productRepository.findByNameContainingIgnoreCase(keyword);
+    }
 }

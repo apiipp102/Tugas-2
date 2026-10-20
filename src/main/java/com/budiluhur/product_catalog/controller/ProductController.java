@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.budiluhur.product_catalog.exception.ProductNotFoundException;
@@ -32,6 +33,12 @@ public class ProductController {
     @GetMapping
     public List<Product> getAllProducts() {
         return productService.getAllProducts();
+    }
+
+    // Mini Challenge: GET /api/products/search?keyword={keyword}
+    @GetMapping("/search")
+    public List<Product> searchProducts(@RequestParam("keyword") String keyword) {
+        return productService.searchProductsByName(keyword);
     }
 
     // 2. GET BY ID: GET /api/products/{id}
